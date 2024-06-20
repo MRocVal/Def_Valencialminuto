@@ -32,7 +32,7 @@ Valencia in a Minute es una aplicación web que proporciona información en tiem
 
 ## Uso
 
-Para acceder a la APP tan solo haz clik en este link --> [text](https://valencialminutoo.streamlit.app)
+Para acceder a la APP tan solo haz clik en este link --> [Valencialminutoo](https://valencialminutoo.streamlit.app)
 
 ### Página de Inicio
 
@@ -49,10 +49,10 @@ La página de inicio proporciona una descripción general de la aplicación y su
 **Horarios de MetroValencia**
 
 	1.	Selecciona la página “MetroValencia Schedule” en la barra lateral.
-	2.	Ingresa el nombre de la estación de metro en el cuadro de texto.
+	2.	Ingresa el nombre de la estación de metro en el cuadro de texto (con el nombre parcial funciona, prueba con 'benimac').
 	3.	Selecciona la estación de la lista desplegable.
 	4.	Consulta las próximas llegadas y salidas de trenes en la estación seleccionada.
-	5.	Visualiza un mapa interactivo con la distribución de las estaciones de metro seleccionadas.
+	5.	Observa que el tiempo es actualizable cada segundo, si el metro tiene algún problema, tambien se refelja.
 
 **ValenBisi**
 
