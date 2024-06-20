@@ -436,9 +436,9 @@ elif pagina == 'ValenBici':
     # Crear datos de íconos dentro de la función de carga para asegurar su disponibilidad
     data['icon_data'] = [{
         "url": "https://img.icons8.com/emoji/48/000000/bicycle-emoji.png",
-        "width": 128,
-        "height": 128,
-        "anchorY": 128,
+        "width": 256,
+        "height": 256,
+        "anchorY": 256,
     }] * len(data)
     
     st.image('234.jpg')
@@ -527,8 +527,8 @@ elif pagina == 'ValenBici':
                 selected_stations,
                 get_icon='icon_data',
                 get_position='[lon, lat]',
-                size_scale=15,
-                get_size=4,
+                size_scale=30,
+                get_size=10,
                 get_color=[255, 165, 0],
                 pickable=True
             )
