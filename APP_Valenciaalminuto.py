@@ -324,6 +324,101 @@ elif pagina == 'EMT Schedules':
             st.write("No buses available at this moment.")
         except Exception as e:
             st.write("An error occurred. Please try again later.")
+
+elif pagina == 'EMT Betta':
+
+    def obtener_proximos_movimientos_bus(url):
+        # Dummy implementation: Replace with the actual function to get bus arrival times.
+        return [
+            {"Bus": "Bus 1", "Tiempo": "5 min", "Tiempo Restante": 5},
+            {"Bus": "Bus 2", "Tiempo": "10 min", "Tiempo Restante": 10},
+        ]
+
+    def calcular_tiempo_restante_bus(tiempo):
+        # Dummy implementation: Replace with the actual function to calculate remaining time.
+        return int(tiempo.split()[0])
+
+    # Page definition
+    st.markdown("""
+    # Bus Stop Map and Arrivals
+    This map shows the locations of bus stops. Click on a stop to see the next bus arrivals.
+    """)
+
+    # Image (optional)
+    st.image('Plano_general.jpg')
+
+    # Ensure correct data types for latitude and longitude
+    data_EMT[['latitude', 'longitude']] = data_EMT['geo_point_2d'].str.split(',', expand=True).astype(float)
+
+    # Add icon data to the DataFrame
+    data_EMT['icon_data'] = data_EMT.apply(lambda row: {
+        'url': 'https://cdn-icons-png.flaticon.com/128/684/684908.png',
+        'width': 128,
+        'height': 128,
+        'anchorY': 128,
+    }, axis=1)
+
+    # Define the initial map view
+    view_state = pdk.ViewState(
+        latitude=data_EMT['latitude'].mean(),
+        longitude=data_EMT['longitude'].mean(),
+        zoom=11,
+        pitch=50
+    )
+
+    # Define the icon layer
+    icon_layer = pdk.Layer(
+        type='IconLayer',
+        data=data_EMT,
+        get_icon='icon_data',
+        get_size=2.5,
+        size_scale=15,
+        get_position='[longitude, latitude]',
+        pickable=True,
+    )
+
+    # Create the map
+    map = pdk.Deck(
+        layers=[icon_layer],
+        initial_view_state=view_state,
+        map_style='mapbox://styles/mapbox/satellite-v9'  # Satellite view
+    )
+
+    # Display the map
+    st.pydeck_chart(map)
+
+    # Handle map clicks
+    clicked_stop = st.session_state.get('clicked_stop')
+
+    if clicked_stop:
+        st.markdown(f"### Next arrivals for the stop: {clicked_stop['Denominació / Denominación']}")
+        
+        try:
+            url_llegadas = data_EMT[data_EMT['Denominació / Denominación'] == clicked_stop['Denominació / Denominación']]['Pròximes Arribades / Proximas Llegadas'].values[0]
+            llegadas = obtener_proximos_movimientos_bus(url_llegadas)
+            
+            for llegada in llegadas:
+                llegada["Tiempo Restante"] = calcular_tiempo_restante_bus(llegada["Tiempo"])
+            
+            df_llegadas = pd.DataFrame(llegadas).sort_values(by="Tiempo Restante")
+            
+            for _, row in df_llegadas.iterrows():
+                st.markdown(f"**Bus:** {row['Bus']} | **Time:** {row['Tiempo']} | **Remaining Time:** {row['Tiempo Restante']} minutes")
+            
+        except KeyError:
+            st.write("No buses available at this moment.")
+        except Exception as e:
+            st.write("An error occurred. Please try again later.")
+    else:
+        st.write("Click on a bus stop to see the next arrivals.")
+
+    # Map click callback
+    st.session_state['clicked_stop'] = st.session_state.get('clicked_stop', None)
+
+    def on_click(info):
+        st.session_state['clicked_stop'] = info['object']
+
+    map.on_click(on_click)
     
 elif pagina == 'EMT Map':
     import pandas as pd
