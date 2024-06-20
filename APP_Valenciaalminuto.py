@@ -107,8 +107,6 @@ def calcular_tiempo_restante(hora_llegada):
     except ValueError:
         return '+1 hora'
 
-
-
 def calcular_tiempo_restante_bus(hora_llegada):
     try:
         # Extraer solo los minutos del texto
@@ -326,18 +324,6 @@ elif pagina == 'EMT Schedules':
             st.write("An error occurred. Please try again later.")
 
 elif pagina == 'EMT Betta':
-
-    # Funciones de ejemplo
-    def obtener_proximos_movimientos_bus(url):
-        # Dummy implementation: Replace with the actual function to get bus arrival times.
-        return [
-            {"Bus": "Bus 1", "Tiempo": "5 min", "Tiempo Restante": 5},
-            {"Bus": "Bus 2", "Tiempo": "10 min", "Tiempo Restante": 10},
-        ]
-
-    def calcular_tiempo_restante_bus(tiempo):
-        # Dummy implementation: Replace with the actual function to calculate remaining time.
-        return int(tiempo.split()[0])
 
     # Datos de ejemplo para las paradas
     data_EMT = pd.DataFrame({
