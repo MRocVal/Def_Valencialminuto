@@ -325,13 +325,6 @@ elif pagina == 'EMT Schedules':
 
 elif pagina == 'EMT Betta':
 
-    # Datos de ejemplo para las paradas
-    data_EMT = pd.DataFrame({
-        'Denominació / Denominación': ['Stop 1', 'Stop 2', 'Stop 3'],
-        'geo_point_2d': ['39.4699,-0.3763', '39.4702,-0.3774', '39.4712,-0.3785'],
-        'Pròximes Arribades / Proximas Llegadas': ['url1', 'url2', 'url3']
-    })
-
     # Asegurar que los tipos de datos sean correctos
     data_EMT[['latitude', 'longitude']] = data_EMT['geo_point_2d'].str.split(',', expand=True).astype(float)
 
