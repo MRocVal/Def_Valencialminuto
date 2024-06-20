@@ -129,8 +129,7 @@ data = pd.read_csv('fgv-bocas.csv', delimiter=';')
 data_EMT = pd.read_csv('emt.csv', delimiter=';')
 
 # Menú de navegación en la barra lateral
-pagina = st.sidebar.selectbox('Selecciona una página', ['Inicio','MetroValencia Schedule','EMT Schedules', 
-                                                        'EMT Map','ValenBici'])
+pagina = st.sidebar.selectbox('Selecciona una página', ['Inicio','MetroValencia Schedule','EMT Schedules','ValenBici'])
 
 if pagina == 'Inicio':
 
@@ -284,18 +283,17 @@ elif pagina == 'MetroValencia Schedule':
 
 elif pagina == 'EMT Schedules':
 
-    # Página de horarios de EMT
     st.markdown("""
     # Next Bus Arrivals
     Quickly check the next arrivals at your bus stop.
     Select a stop and get updated information on the upcoming buses.
     """)
-    st.image('bus.jpg')  # Asegúrate de tener una imagen apropiada o elimina esta línea
+    st.image('bus.jpg')  # Ensure you have an appropriate image or remove this line
 
-    # Filtrar datos para la selección de paradas y ordenar alfabéticamente
+    # Filter data for bus stop selection and sort alphabetically
     paradas = sorted(data_EMT['Denominació / Denominación'].unique())
 
-    # Entrada de texto para la parada de autobús
+    # Text input for the bus stop
     parada_input = st.text_input('Enter the name or number of the stop:')
     paradas_filtradas = [parada for parada in paradas if parada_input.lower() in parada.lower()]
 
@@ -303,73 +301,32 @@ elif pagina == 'EMT Schedules':
 
     if parada_seleccionada:
         try:
-            # Verificar si la parada ingresada existe en el DataFrame
+            # Verify if the entered stop exists in the DataFrame
             if parada_seleccionada in data_EMT['Denominació / Denominación'].values:
                 url_llegadas = data_EMT[data_EMT['Denominació / Denominación'] == parada_seleccionada]['Pròximes Arribades / Proximas Llegadas'].values[0]
 
                 llegadas = obtener_proximos_movimientos_bus(url_llegadas)
 
-                # Calcular el tiempo restante para las llegadas
+                # Calculate the remaining time for arrivals
                 for llegada in llegadas:
                     llegada["Tiempo Restante"] = calcular_tiempo_restante_bus(llegada["Tiempo"])
 
                 st.markdown(f"### Next arrivals for the stop: {parada_seleccionada}")
                 df_llegadas = pd.DataFrame(llegadas).sort_values(by="Tiempo Restante")
 
-                # Mostrar llegadas en una tabla
-                st.table(df_llegadas[['Bus', 'Tiempo', 'Tiempo Restante']])
+                df_llegadas['Tiempo'].apply(lambda x: st.markdown(f"<h3 style='font-size:50px;'>{x}</h3>", unsafe_allow_html=True))
 
-                # Mostrar un mapa con la ubicación de la parada seleccionada
-                st.markdown("### Location of the selected stop:")
-                stop_location = data_EMT[data_EMT['Denominació / Denominación'] == parada_seleccionada][['latitude', 'longitude']].values[0]
-                stop_map = pdk.Deck(
-                    initial_view_state=pdk.ViewState(
-                        latitude=stop_location[0],
-                        longitude=stop_location[1],
-                        zoom=15,
-                        pitch=50,
-                    ),
-                    layers=[
-                        pdk.Layer(
-                            'ScatterplotLayer',
-                            data=pd.DataFrame([{'lat': stop_location[0], 'lon': stop_location[1]}]),
-                            get_position='[lon, lat]',
-                            get_radius=200,
-                            get_color=[255, 0, 0],
-                            pickable=True
-                        )
-                    ]
-                )
-                st.pydeck_chart(stop_map)
-
-                # Generar el código QR para la parada seleccionada
-                st.markdown("#### Generate QR Code for this stop")
-                if st.button("Generate QR Code"):
-                    qr_url = f"https://valencialminutoo.streamlit.app/?stop={parada_seleccionada.replace(' ', '%20')}"
-                    qr = qrcode.QRCode(
-                        version=1,
-                        error_correction=qrcode.constants.ERROR_CORRECT_L,
-                        box_size=10,
-                        border=4,
-                    )
-                    qr.add_data(qr_url)
-                    qr.make(fit=True)
-                    img = qr.make_image(fill_color="black", back_color="white")
-                    img_byte_arr = BytesIO()
-                    img.save(img_byte_arr, format='PNG')
-                    st.image(img_byte_arr.getvalue(), caption=f"QR Code for stop: {parada_seleccionada}")
-
-                # Autorefresh cada 60 segundos
-                st_autorefresh(interval=60000, key="next_arrivals_autorefresh")
-
+                # Add a 60-second pause for the update
+                time.sleep(60)
+                st.experimental_rerun()
             else:
                 st.write("The stop entered is not found in the dataset.")
         except KeyError:
             st.write("No buses available at this moment.")
         except Exception as e:
-            st.write(f"An error occurred: {e}")
+            st.write("An error occurred. Please try again later.")
   
-elif pagina == 'EMT Map':
+
     import pandas as pd
     import pydeck as pdk
     import streamlit as st
