@@ -502,7 +502,7 @@ elif pagina == 'ValenBici':
     if st.sidebar.button("Calculate Route"):
         route, duration = get_route_time(coords1, coords2, MAPBOX_API_KEY)
         if route:
-            st.sidebar.write(f"Estimated time: {duration:.2f} minutos")
+            st.sidebar.write(f"Estimated time: {duration} minutos")
     
             # Añadir la ruta al mapa
             route_layer = pdk.Layer(
