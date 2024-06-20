@@ -126,7 +126,7 @@ data = pd.read_csv('fgv-bocas.csv', delimiter=';')
 data_EMT = pd.read_csv('emt.csv', delimiter=';')
 
 # Menú de navegación en la barra lateral
-pagina = st.sidebar.selectbox('Selecciona una página', ['Inicio','EMT Betta','MetroValencia Schedule','EMT Schedules', 
+pagina = st.sidebar.selectbox('Selecciona una página', ['Inicio','MetroValencia Schedule','EMT Schedules', 
                                                         'EMT Map','ValenBici'])
 
 if pagina == 'Inicio':
@@ -323,69 +323,6 @@ elif pagina == 'EMT Schedules':
         except Exception as e:
             st.write("An error occurred. Please try again later.")
 
-elif pagina == 'EMT Betta':
-
-    # Asegurar que los tipos de datos sean correctos
-    data_EMT[['latitude', 'longitude']] = data_EMT['geo_point_2d'].str.split(',', expand=True).astype(float)
-
-    # Agregar datos de ícono a los datos
-    data_EMT['icon_data'] = data_EMT.apply(lambda row: {
-        'url': 'https://cdn-icons-png.flaticon.com/128/684/684908.png',
-        'width': 128,
-        'height': 128,
-        'anchorY': 128,
-    }, axis=1)
-
-    # Definir el estado inicial del mapa
-    view_state = pdk.ViewState(
-        latitude=data_EMT['latitude'].mean(),
-        longitude=data_EMT['longitude'].mean(),
-        zoom=11,
-        pitch=50
-    )
-
-    # Definir la capa de íconos
-    icon_layer = pdk.Layer(
-        type='IconLayer',
-        data=data_EMT,
-        get_icon='icon_data',
-        get_size=2.5,
-        size_scale=15,
-        get_position='[longitude, latitude]',
-        pickable=True,
-    )
-
-    # Crear el mapa con vista satelital
-    map = pdk.Deck(
-        layers=[icon_layer],
-        initial_view_state=view_state,
-        map_style='mapbox://styles/mapbox/satellite-v9'
-    )
-
-    # Mostrar el mapa
-    st.pydeck_chart(map)
-
-    # Selección de parada de bus
-    parada_seleccionada = st.selectbox('Selecciona una parada:', data_EMT['Denominació / Denominación'])
-
-    if parada_seleccionada:
-        try:
-            url_llegadas = data_EMT[data_EMT['Denominació / Denominación'] == parada_seleccionada]['Pròximes Arribades / Proximas Llegadas'].values[0]
-            llegadas = obtener_proximos_movimientos_bus(url_llegadas)
-            
-            for llegada in llegadas:
-                llegada["Tiempo Restante"] = calcular_tiempo_restante_bus(llegada["Tiempo"])
-            
-            df_llegadas = pd.DataFrame(llegadas).sort_values(by="Tiempo Restante")
-            
-            st.markdown(f"### Próximas llegadas para la parada: {parada_seleccionada}")
-            for _, row in df_llegadas.iterrows():
-                st.markdown(f"**Bus:** {row['Bus']} | **Tiempo:** {row['Tiempo']} | **Tiempo Restante:** {row['Tiempo Restante']} minutos")
-            
-        except KeyError:
-            st.write("No hay autobuses disponibles en este momento.")
-        except Exception as e:
-            st.write(f"Ha ocurrido un error: {e}")
     
 elif pagina == 'EMT Map':
     import pandas as pd
