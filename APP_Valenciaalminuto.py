@@ -544,7 +544,7 @@ elif pagina == 'ValenBici':
                             "<b>Status:</b> {status}",
                     "style": {
                         "backgroundColor": "white",
-                        "color": "blue"
+                        "color": "#B6E59E"
                     }
                 }
             ))
@@ -582,7 +582,7 @@ elif pagina == 'ValenBici':
                         ,"<b>Status:</b> {status}"
                 "style": {
                     "backgroundColor": "white",
-                    "color": "blue"
+                    "color": "#B6E59E"
                 }
             }
         ))
