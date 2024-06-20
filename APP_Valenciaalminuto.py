@@ -543,8 +543,8 @@ elif pagina == 'ValenBici':
                             "<b>Free Spaces:</b> {available_bike_stands}<br/>"
                             "<b>Status:</b> {status}",
                     "style": {
-                        "backgroundColor": "steelblue",
-                        "color": "white"
+                        "backgroundColor": "white",
+                        "color": "blue"
                     }
                 }
             ))
@@ -582,7 +582,7 @@ elif pagina == 'ValenBici':
                         ,"<b>Status:</b> {status}"
                 "style": {
                     "backgroundColor": "white",
-                    "color": "white"
+                    "color": "blue"
                 }
             }
         ))
