@@ -13,9 +13,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import time
-import qrcode
-from PIL import Image
-from io import BytesIO
+
 
 
 # ::::::::::::::::::::::::::::: FUNCIONES ::::::::::::::::::::::::::::::::
