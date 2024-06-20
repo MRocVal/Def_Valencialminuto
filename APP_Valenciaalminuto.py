@@ -128,13 +128,13 @@ data = pd.read_csv('fgv-bocas.csv', delimiter=';')
 data_EMT = pd.read_csv('emt.csv', delimiter=';')
 
 # Menú de navegación en la barra lateral
-pagina = st.sidebar.selectbox('Selecciona una página', ['Home','MetroValencia Schedule','Arrival notification by email','EMT Schedules', 
+pagina = st.sidebar.selectbox('Selecciona una página', ['Inicio','MetroValencia Schedule','EMT Schedules', 
                                                         'EMT Map','ValenBici'])
 
-if pagina == 'Home':
-    
-    st.image('1.jpg')
+if pagina == 'Inicio':
+
     st.title("VALENCIA IN A MINUTE")
+    st.image('1.jpg')
     
     # Sección para próximas llegadas y salidas
     st.markdown("""
@@ -280,108 +280,6 @@ elif pagina == 'Interactive Map':
         st.pydeck_chart(map)
     else:
         st.write("No data available for the selected lines.")
-
-elif pagina == 'Arrival notification by email':
-
-    
-    # Mostrar imagen
-    st.image('estacion_T.jpg')
-    
-    # Texto introductorio
-    st.markdown("""
-    # Next Arrivals and Departures by Email
-    ### Tired of missing the subway?
-    
-    We've got the perfect solution for you! Just enter your email, pick your stop, and choose how many minutes in advance you need updates. You'll get an email with the latest info on your stop every minute.
-    
-    Say goodbye to being late for your appointments or work!
-    """)
-    
-    # Carga los datos de las estaciones de metro
-    def load_metro_data():
-        return pd.read_csv('fgv-bocas.csv', delimiter=';')
-    
-    # Función para obtener las próximas llegadas de la estación
-    def obtener_proximos_movimientos(url):
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        movimientos = []
-        for div in soup.find_all('div', style=lambda value: value and 'padding-left: 5px' in value):
-            numero_linea = div.find('img')['src'].split('_')[-1].split('.')[0]
-            destino = div.find('b').text.strip()
-            tiempo = div.find_all('span')[-1].text.strip()
-            movimientos.append({"Número de Línea": numero_linea, "Destino": destino, "Tiempo": tiempo})
-        return movimientos
-    
-    # Función para calcular el tiempo restante
-    def calcular_tiempo_restante(hora_llegada):
-        formato = '%H:%M:%S'
-        ahora = datetime.now().strftime(formato)
-        hora_actual = datetime.strptime(ahora, formato)
-        hora_llegada_dt = datetime.strptime(hora_llegada, formato)
-        if hora_llegada_dt < hora_actual:
-            hora_llegada_dt += timedelta(days=1)
-        tiempo_restante = hora_llegada_dt - hora_actual
-        return int(tiempo_restante.total_seconds() / 60)  # Devuelve el tiempo en minutos
-    
-    # Función para enviar correos electrónicos con yagmail
-    def send_email(to_email, subject, message):
-        yag = yagmail.SMTP('mrocval018@gmail.com', 'qppo ppbx zpny ygbo')
-        try:
-            yag.send(to=to_email, subject=subject, contents=message)
-            st.success('Email sent successfully!')
-        except Exception as e:
-            st.error(f'An error occurred: {e}')
-    
-    # Cargar los datos de las estaciones
-    metro_data = load_metro_data()
-    
-    # Selección de estación
-    estaciones = sorted(metro_data['Denominació / Denominación'].unique())
-    estacion_seleccionada = st.selectbox('Select a Station:', estaciones)
-    
-    # Entrada para correo electrónico del usuario
-    user_email = st.text_input('Enter your email for notifications')
-    
-    # Tiempo de alerta antes de la llegada
-    alert_time = st.number_input('Alert me X minutes before arrival:', min_value=1, max_value=60, value=10)
-    
-    # Diccionario para rastrear si ya se ha enviado un correo para una llegada específica
-    if 'emails_sent' not in st.session_state:
-        st.session_state['emails_sent'] = {}
-    
-    # Bandera para seguir verificando las llegadas
-    if 'checking_arrivals' not in st.session_state:
-        st.session_state['checking_arrivals'] = False
-    
-    def check_arrivals():
-        if estacion_seleccionada and user_email:
-            url_llegadas = metro_data[metro_data['Denominació / Denominación'] == estacion_seleccionada]['Pròximes Arribades / Próximas llegadas'].values[0]
-            llegadas = obtener_proximos_movimientos(url_llegadas)
-            alert_llegadas = []
-            for llegada in llegadas:
-                tiempo_restante = calcular_tiempo_restante(llegada["Tiempo"])
-                if tiempo_restante <= alert_time:
-                    alert_llegadas.append(f"Línea {llegada['Número de Línea']} hacia {llegada['Destino']} en {tiempo_restante} minutos")
-            if alert_llegadas:
-                subject = 'Your Metro Arrivals'
-                message = "The following metros are arriving soon:\n" + "\n".join(alert_llegadas)
-                send_email(user_email, subject, message)
-                st.success(f'Email sent with the following arrivals:\n{message}')
-            df_llegadas = pd.DataFrame(llegadas)
-            st.table(df_llegadas)
-    
-    if st.button('Check for Arrivals') or st.session_state['checking_arrivals']:
-        st.session_state['checking_arrivals'] = True
-        check_arrivals()
-        time.sleep(60)
-        st.experimental_rerun()
-    
-    # Instrucciones adicionales
-    st.markdown("""
-    #### Additional Information
-    This application is designed to provide real-time updates and organize travel efficiently. You can plan your routes, receive notifications about changes and delays, and access recommendations for the quickest and most convenient trips. Join us and discover a new way to travel by metro.
-    """)
 
 elif pagina == 'EMT Schedules':
     st.markdown("""
