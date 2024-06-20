@@ -32,6 +32,8 @@ Valencia in a Minute es una aplicación web que proporciona información en tiem
 
 ## Uso
 
+Para acceder a la APP tan solo haz clik en este link --> [text](https://valencialminutoo.streamlit.app)
+
 ### Página de Inicio
 
 La página de inicio proporciona una descripción general de la aplicación y su propósito.
