@@ -319,7 +319,7 @@ elif pagina == 'EMT Schedules':
                 # Generar el código QR para la parada seleccionada
                 st.markdown("#### Generate QR Code for this stop")
                 if st.button("Generate QR Code"):
-                    qr_url = f"https://your-streamlit-app-url.com?stop={parada_seleccionada.replace(' ', '%20')}"
+                    qr_url = f"https://valencialminutoo.streamlit.app/?stop={parada_seleccionada.replace(' ', '%20')}"
                     qr = qrcode.QRCode(
                         version=1,
                         error_correction=qrcode.constants.ERROR_CORRECT_L,
