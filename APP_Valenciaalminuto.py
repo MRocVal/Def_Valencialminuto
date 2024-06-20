@@ -13,6 +13,9 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import time
+import qrcode
+from PIL import Image
+from io import BytesIO
 
 
 # ::::::::::::::::::::::::::::: FUNCIONES ::::::::::::::::::::::::::::::::
@@ -285,12 +288,12 @@ elif pagina == 'EMT Schedules':
     Quickly check the next arrivals at your bus stop.
     Select a stop and get updated information on the upcoming buses.
     """)
-    st.image('bus.jpg')  # Ensure you have an appropriate image or remove this line
+    st.image('bus.jpg')  # Asegúrate de tener una imagen apropiada o elimina esta línea
 
-    # Filter data for bus stop selection and sort alphabetically
+    # Filtrar datos para la selección de paradas y ordenar alfabéticamente
     paradas = sorted(data_EMT['Denominació / Denominación'].unique())
 
-    # Text input for the bus stop
+    # Entrada de texto para la parada de autobús
     parada_input = st.text_input('Enter the name or number of the stop:')
     paradas_filtradas = [parada for parada in paradas if parada_input.lower() in parada.lower()]
 
@@ -298,13 +301,13 @@ elif pagina == 'EMT Schedules':
 
     if parada_seleccionada:
         try:
-            # Verify if the entered stop exists in the DataFrame
+            # Verificar si la parada ingresada existe en el DataFrame
             if parada_seleccionada in data_EMT['Denominació / Denominación'].values:
                 url_llegadas = data_EMT[data_EMT['Denominació / Denominación'] == parada_seleccionada]['Pròximes Arribades / Proximas Llegadas'].values[0]
 
                 llegadas = obtener_proximos_movimientos_bus(url_llegadas)
 
-                # Calculate the remaining time for arrivals
+                # Calcular el tiempo restante para las llegadas
                 for llegada in llegadas:
                     llegada["Tiempo Restante"] = calcular_tiempo_restante_bus(llegada["Tiempo"])
 
@@ -313,7 +316,24 @@ elif pagina == 'EMT Schedules':
 
                 df_llegadas['Tiempo'].apply(lambda x: st.markdown(f"<h3 style='font-size:50px;'>{x}</h3>", unsafe_allow_html=True))
 
-                # Add a 60-second pause for the update
+                # Generar el código QR para la parada seleccionada
+                st.markdown("#### Generate QR Code for this stop")
+                if st.button("Generate QR Code"):
+                    qr_url = f"https://your-streamlit-app-url.com?stop={parada_seleccionada.replace(' ', '%20')}"
+                    qr = qrcode.QRCode(
+                        version=1,
+                        error_correction=qrcode.constants.ERROR_CORRECT_L,
+                        box_size=10,
+                        border=4,
+                    )
+                    qr.add_data(qr_url)
+                    qr.make(fit=True)
+                    img = qr.make_image(fill_color="black", back_color="white")
+                    img_byte_arr = BytesIO()
+                    img.save(img_byte_arr, format='PNG')
+                    st.image(img_byte_arr.getvalue(), caption=f"QR Code for stop: {parada_seleccionada}")
+
+                # Añadir una pausa de 60 segundos para la actualización
                 time.sleep(60)
                 st.experimental_rerun()
             else:
@@ -321,7 +341,7 @@ elif pagina == 'EMT Schedules':
         except KeyError:
             st.write("No buses available at this moment.")
         except Exception as e:
-            st.write("An error occurred. Please try again later.")
+            st.write(f"An error occurred: {e}")
   
 elif pagina == 'EMT Map':
     import pandas as pd
