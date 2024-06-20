@@ -537,7 +537,7 @@ elif pagina == 'ValenBici':
             st.pydeck_chart(pdk.Deck(
                 layers=[icon_layer, route_layer],
                 initial_view_state=view_state,
-                map_style='mapbox://styles/mapbox/light-v9',
+                map_style='mapbox://styles/mapbox/navigation-day-v1',
                 tooltip={
                     "html": "<b>Address:</b> {address}<br/>"
                             "<b>Bikes Available:</b> {available_bikes}<br/>"
