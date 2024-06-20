@@ -207,7 +207,7 @@ elif pagina == 'MetroValencia Schedule':
         else:
             st.write("The station entered is not found in the dataset.")
 
-elif pagina == 'Interactive Map':
+
     # Descripción de la aplicación
     
     st.markdown("""
@@ -322,8 +322,7 @@ elif pagina == 'EMT Schedules':
             st.write("No buses available at this moment.")
         except Exception as e:
             st.write("An error occurred. Please try again later.")
-
-    
+  
 elif pagina == 'EMT Map':
     import pandas as pd
     import pydeck as pdk
