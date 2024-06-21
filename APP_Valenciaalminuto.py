@@ -13,6 +13,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import time
+import os
 
 
 
@@ -54,10 +55,19 @@ def obtener_proximos_movimientos_bus(url):
         for div in soup.find_all('div', style=lambda value: value and 'padding-left: 5px' in value):
             imagen = div.find('img')
             if imagen:
-                # Extraer el número de la línea desde la URL de la imagen
-                numero_linea = imagen['src'].split('_')[-1].split('.')[0]
+                # Extraer la URL completa del icono de la línea
+                url_icono = imagen['src']
+                nombre_icono = url_icono.split('/')[-1]
+                path_icono = os.path.join('icons', nombre_icono)
+                
+                # Descargar el icono si no existe localmente
+                if not os.path.exists(path_icono):
+                    img_data = requests.get(url_icono).content
+                    os.makedirs('icons', exist_ok=True)
+                    with open(path_icono, 'wb') as handler:
+                        handler.write(img_data)
             else:
-                numero_linea = "Desconocido"
+                path_icono = None
 
             b_tag = div.find('b')
             if b_tag:
@@ -73,7 +83,7 @@ def obtener_proximos_movimientos_bus(url):
                 tiempo = "Tiempo desconocido"
 
             movimientos.append({
-                "Número de Línea": numero_linea,
+                "Icono": path_icono,
                 "Destino": destino,
                 "Tiempo": tiempo
             })
@@ -315,7 +325,9 @@ elif pagina == 'EMT Schedules':
 
                 # Display the bus line, destination, and remaining time
                 for index, row in df_llegadas.iterrows():
-                    st.markdown(f"<h3 style='font-size:30px;'>Line: {row['Número de Línea']} - Destination: {row['Destino']} - Time: {row['Tiempo']}</h3>", unsafe_allow_html=True)
+                    if row['Icono']:
+                        st.image(row['Icono'], width=50)
+                    st.markdown(f"<h3 style='font-size:30px;'>Destination: {row['Destino']} - Time: {row['Tiempo']}</h3>", unsafe_allow_html=True)
 
                 # Add a 60-second pause for the update
                 time.sleep(60)
