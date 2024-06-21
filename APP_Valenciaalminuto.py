@@ -320,7 +320,7 @@ elif pagina == 'EMT Schedules':
                 for llegada in llegadas:
                     llegada["Tiempo Restante"] = calcular_tiempo_restante_bus(llegada["Tiempo"])
 
-                st.markdown(f"### Next arrivals for the stop: {parada_seleccionada}/n")
+                st.markdown(f"### Next arrivals for the stop: {parada_seleccionada}\n")
                 df_llegadas = pd.DataFrame(llegadas).sort_values(by="Tiempo Restante")
 
                 # Display the bus line, destination, and remaining time
