@@ -328,7 +328,7 @@ elif pagina == 'EMT Schedules':
                 for index, row in df_llegadas.iterrows():
                     if row['Icono']:
                         st.image(row['Icono'], width=50)
-                    st.markdown(f"<h3 style='font-size:30px;'>- Destino: {row['Tiempo']}</h3>", unsafe_allow_html=True)
+                    st.markdown(f"<h3 style='font-size:30px;'>- Destination: {row['Tiempo']}</h3>", unsafe_allow_html=True)
 
                 # Add a 60-second pause for the update
                 time.sleep(60)
