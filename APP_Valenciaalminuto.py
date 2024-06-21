@@ -279,6 +279,7 @@ elif pagina == 'MetroValencia Schedule':
     else:
         st.write("No data available for the selected lines.")
 
+
 elif pagina == 'EMT Schedules':
 
     st.markdown("""
@@ -312,7 +313,9 @@ elif pagina == 'EMT Schedules':
                 st.markdown(f"### Next arrivals for the stop: {parada_seleccionada}")
                 df_llegadas = pd.DataFrame(llegadas).sort_values(by="Tiempo Restante")
 
-                df_llegadas['Tiempo'].apply(lambda x: st.markdown(f"<h3 style='font-size:50px;'>{x}</h3>", unsafe_allow_html=True))
+                # Display the bus line, destination, and remaining time
+                for index, row in df_llegadas.iterrows():
+                    st.markdown(f"<h3 style='font-size:30px;'>Line: {row['Número de Línea']} - Destination: {row['Destino']} - Time: {row['Tiempo']}</h3>", unsafe_allow_html=True)
 
                 # Add a 60-second pause for the update
                 time.sleep(60)
@@ -324,8 +327,6 @@ elif pagina == 'EMT Schedules':
         except Exception as e:
             st.write("An error occurred. Please try again later.")
   
-
-
 
 elif pagina == 'ValenBici':
     
