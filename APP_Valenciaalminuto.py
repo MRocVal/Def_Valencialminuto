@@ -325,6 +325,92 @@ elif pagina == 'EMT Schedules':
             st.write("An error occurred. Please try again later.")
   
 
+    import pandas as pd
+    import pydeck as pdk
+    import streamlit as st
+
+    # Descripción de la aplicación
+    st.markdown("""
+                
+    # Interactive Map of EMT Bus Stops
+Welcome to the interactive visualization of EMT bus stops in Valencia.
+This map shows the locations of selected bus stops.
+You can choose the stops you are interested in and see their geographical distribution.
+    
+    """)
+
+    # Agregar una foto
+    st.image('esat.jpg')
+
+    # Cargar y preparar los datos
+    def load_data():
+        data = pd.read_csv('emt.csv', delimiter=';')
+        data['lon'], data['lat'] = zip(*data['geo_point_2d'].apply(lambda x: (float(x.split(',')[1]), float(x.split(',')[0]))))
+        return data
+
+    data = load_data()
+
+    # Entrada para filtrar paradas por nombre
+    filter_query = st.text_input('Filter stops by name: ')
+
+    # Filtrar las paradas que coincidan con la entrada del usuario
+    if filter_query:
+        filtered_stops = data[data['Denominació / Denominación'].str.contains(filter_query, case=False, na=False)]
+    else:
+        filtered_stops = data
+
+    selected_stop = None
+
+    # Checkbox para seleccionar todas las paradas
+    if st.checkbox('Select All Stops'):
+        selected_stops = filtered_stops
+    else:
+        selected_stops = st.multiselect('Select Stops:', options=filtered_stops['Denominació / Denominación'].unique())
+
+    # Filtrar datos en función de las paradas seleccionadas
+    filtered_data_stops = filtered_stops[filtered_stops['Denominació / Denominación'].isin(selected_stops)]
+
+    # Verificar si hay datos para mostrar
+    if not filtered_data_stops.empty:
+        # Agregar datos de ícono a los datos filtrados
+        filtered_data_stops['icon_data'] = filtered_data_stops.apply(lambda row: {
+            'url': 'https://cdn-icons-png.flaticon.com/128/3176/3176278.png',
+            'width': 128,
+            'height': 128,
+            'anchorY': 128,
+        }, axis=1)
+
+        # Definir el estado inicial del mapa
+        view_state = pdk.ViewState(
+            latitude=filtered_data_stops['lat'].mean(),
+            longitude=filtered_data_stops['lon'].mean(),
+            zoom=12,
+            pitch=50
+        )
+
+        # Definir la capa de íconos
+        icon_layer = pdk.Layer(
+            'IconLayer',
+            data=filtered_data_stops,
+            get_icon='icon_data',
+            get_size=2.5,
+            size_scale=15,
+            get_position='[lon, lat]',
+            pickable=True,
+            auto_highlight=True
+        )
+
+        # Crear el mapa con vista satelital
+        map = pdk.Deck(
+            layers=[icon_layer],
+            initial_view_state=view_state,
+            map_style='mapbox://styles/mapbox/satellite-v9',
+            tooltip={"text": "{Denominació / Denominación}\nBuses: {Línies / Líneas}"}
+        )
+
+        st.pydeck_chart(map)
+    else:
+        st.write("No data available for the selected stops.")
 
 elif pagina == 'ValenBici':
     
